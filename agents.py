@@ -114,12 +114,102 @@ class HeuristicAgent(Agent):
 
 class StudentAgent(Agent):
     def get_action(self, game):
-        # Example of how to watch for the time limit
-        # start_time = time.time()
-        # while time.time() - start_time < self.time_limit:
-        #     # Do some work
-        #     # break if we run out of time
-        #     pass
+        self.start_time = time.time()
+        self.player = game.to_move()
+        best_score = float('-inf')
+        best_move = None
+
+        for move in game.actions():
+            new_game = game.result(move)
+            score = self.minimax(new_game, 3, False, player)
+
+            if score > best_score:
+                best_score = score
+                best_move = move
+
+        return best_move if best_move is not None else random.choice(game.actions())
+
+    def minimax(self, game, depth, maximizing, player):
+        if depth == 0 or game.is_terminal():
+            return self.evaluate(game, player)
+
+        if maximizing:
+            best = float('-inf')
+            for move in game.actions():
+                value = self.minimax(game.result(move), depth - 1, False, player)
+                best = max(best, value)
+            return best
+        else:
+            best = float('inf')
+            for move in game.actions():
+                value = self.minimax(game.result(move), depth - 1, True, player)
+                best = min(best, value)
+            return best
+
+    def evaluate(self, game, player):
+        if game.is_terminal():
+            if game.is_win():
+                return 1000 if game.to_move() != player else -1000
+            return 0
+
+        score = 0
+
+        for r in range(game.height):
+            for c in range(game.width):
+                if game.board[r][c] == player:
+                    score += get_max_connected(game, r, c, player)
+                elif game.board[r][c] == -player:
+                    score -= get_max_connected(game, r, c, -player)
+
+        return score
         
+       player = game.to_move()
         valid_locations = game.actions()
-        return random.choice(valid_locations)
+
+        best_score = float('-inf')
+        best_move = None
+
+        for move in valid_locations:
+            new_game = game.result(move)
+            score = self.minimax(new_game, 3, False, player)
+
+            if score > best_score:
+                best_score = score
+                best_move = move
+        if best_move is None:
+            return random.choice(valid_locations)
+
+        return best_move
+
+    def minimax(self, game, depth, maximizing, player):
+        if depth == 0 or game.is_terminal():
+            return self.evaluate(game, player)
+
+        if maximizing:
+            best = float('-inf')
+            for move in game.actions():
+                value = self.minimax(game.result(move), depth - 1, False, player)
+                best = max(best, value)
+            return best
+        else:
+            best = float('inf')
+            for move in game.actions():
+                value = self.minimax(game.result(move), depth - 1, True, player)
+                best = min(best, value)
+            return best
+
+    def evaluate(self, game, player):
+        if game.is_terminal():
+            if game.is_win():
+                return 1000 if game.to_move() != player else -1000
+            return 0
+
+        score = 0
+        for r in range(game.height):
+            for c in range(game.width):
+                if game.board[r][c] == player:
+                    score += 1
+                elif game.board[r][c] == -player:
+                    score -= 1
+
+        return score
