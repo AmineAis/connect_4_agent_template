@@ -163,7 +163,7 @@ class StudentAgent(Agent):
 
         return score
         
-       player = game.to_move()
+        player = game.to_move()
         valid_locations = game.actions()
 
         best_score = float('-inf')
