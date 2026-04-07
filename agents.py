@@ -115,7 +115,7 @@ class HeuristicAgent(Agent):
 class StudentAgent(Agent):
     def get_action(self, game):
         self.start_time = time.time()
-        self.player = game.to_move()
+        player = game.to_move()
         best_score = float('-inf')
         best_move = None
 
